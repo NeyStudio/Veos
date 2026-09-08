@@ -13,7 +13,6 @@
       --text: #f8fafc;
       --text-sub: #94a3b8;
       --border: #1e293b;
-      --danger: #ef4444;
       --success: #22c55e;
     }
     body {
@@ -42,6 +41,11 @@
       font-size: 20px;
       color: var(--accent);
       letter-spacing: -0.5px;
+    }
+    .date-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .badge {
       display: inline-block;
@@ -74,14 +78,42 @@
       border: 1px solid var(--accent);
     }
     
-    /* Formatage esthétique du contenu généré */
-    .formatted-content h3 { color: var(--accent); font-size: 15px; margin: 12px 0 6px 0; }
-    .formatted-content ul { padding-left: 18px; margin: 6px 0; }
-    .formatted-content li { margin-bottom: 4px; font-size: 14px; line-height: 1.4; color: #e2e8f0; }
-    .formatted-content p { font-size: 14px; line-height: 1.4; margin: 6px 0; }
-    .formatted-content strong { color: #ffffff; }
+    /* Formatage esthétique avancé sans Markdown brut */
+    .clean-content h3, .clean-content h4 {
+      color: var(--accent);
+      margin: 14px 0 6px 0;
+      font-size: 16px;
+    }
+    .clean-content ul {
+      padding-left: 18px;
+      margin: 8px 0;
+    }
+    .clean-content li {
+      margin-bottom: 6px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #e2e8f0;
+    }
+    .clean-content p {
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 8px 0;
+      color: var(--text);
+    }
+    .exercise-box {
+      background: var(--card-accent);
+      border-left: 3px solid var(--accent);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .exercise-box h4 {
+      margin: 0 0 6px 0;
+      color: var(--text);
+      font-size: 15px;
+    }
 
-    /* Bottom Navigation Bar */
+    /* Navigation Bas de Page */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -135,6 +167,15 @@
       cursor: pointer;
       border: none;
     }
+    button.refresh-sub-btn {
+      background: var(--card-accent);
+      color: var(--accent);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   </style>
 </head>
@@ -147,56 +188,68 @@
       <h1>VOL D'ESPRIT OS</h1>
       <span class="badge" id="currentDate">--/--/----</span>
     </div>
-    <button onclick="forceRefreshDay()" style="width:auto; padding:6px 12px; font-size:12px; background:var(--card-accent); color:var(--accent); border:1px solid var(--border); border-radius:8px;">Actualiser</button>
+    <div class="date-nav">
+      <button onclick="changeDay(-1)" style="width:auto; padding:6px 12px; background:var(--card-accent); color:var(--text); border:1px solid var(--border); border-radius:8px;">&lt;</button>
+      <button onclick="changeDay(1)" style="width:auto; padding:6px 12px; background:var(--card-accent); color:var(--text); border:1px solid var(--border); border-radius:8px;">&gt;</button>
+    </div>
   </div>
 
-  <!-- Saisie Clé API (Masquée dès que configurée) -->
+  <!-- Configuration Clé API -->
   <div class="card" id="apiKeyCard">
     <div class="card-title">Configuration Clé API</div>
     <input type="password" id="apiKey" placeholder="Colle ta clé API Gemini (AIzaSy...)">
-    <button class="action-btn" onclick="saveApiKey()">Enregistrer</button>
+    <button class="action-btn" onclick="saveApiKey()">Enregistrer la clé</button>
   </div>
 
-  <!-- SECTION 1 : BRIEFING (ACCUEIL) -->
+  <!-- TAB 1 : BRIEFING -->
   <div id="tab-briefing" class="tab-content active">
     <div class="card now-brief">
-      <div class="card-title">Now Briefing</div>
-      <div id="briefingContent" class="formatted-content">Mise à jour automatique en cours...</div>
+      <div class="card-title">
+        <span>Now Briefing</span>
+        <button class="refresh-sub-btn" onclick="refreshSection('briefing')">Actualiser</button>
+      </div>
+      <div id="briefingContent" class="clean-content">Chargement...</div>
     </div>
     
     <div class="card">
-      <div class="card-title">Rappel Routine</div>
+      <div class="card-title">Planning de la Semaine</div>
       <ul style="padding-left:18px; margin:0; font-size:14px; color:var(--text-sub);">
         <li><strong>Lundi / Mercredi / Vendredi</strong> : Musculation</li>
         <li><strong>Dimanche</strong> : Course à pied</li>
-        <li><strong>Matin</strong> : Quark, miel, flocons d'avoine</li>
+        <li><strong>Mardi / Jeudi / Samedi</strong> : Récupération active</li>
       </ul>
     </div>
   </div>
 
-  <!-- SECTION 2 : PROGRAMME -->
+  <!-- TAB 2 : SEANCE -->
   <div id="tab-workout" class="tab-content">
     <div class="card">
       <div class="card-title">
         <span>Programme du Jour</span>
-        <span id="workoutTypeBadge" class="badge">--</span>
+        <div>
+          <span id="workoutTypeBadge" class="badge" style="margin-right:6px;">--</span>
+          <button class="refresh-sub-btn" onclick="refreshSection('workout')">Actualiser</button>
+        </div>
       </div>
-      <div id="workoutContent" class="formatted-content">Chargement de la séance...</div>
+      <div id="workoutContent" class="clean-content">Chargement...</div>
     </div>
   </div>
 
-  <!-- SECTION 3 : NUTRITION -->
+  <!-- TAB 3 : NUTRITION -->
   <div id="tab-nutrition" class="tab-content">
     <div class="card">
-      <div class="card-title">Plan Nutritionnel</div>
-      <div id="nutritionContent" class="formatted-content">Chargement du plan repas...</div>
+      <div class="card-title">
+        <span>Plan Nutritionnel</span>
+        <button class="refresh-sub-btn" onclick="refreshSection('nutrition')">Actualiser</button>
+      </div>
+      <div id="nutritionContent" class="clean-content">Chargement...</div>
     </div>
   </div>
 
-  <!-- SECTION 4 : SUIVI & MESURES -->
+  <!-- TAB 4 : SUIVI & PERFORMANCES -->
   <div id="tab-tracker" class="tab-content">
     <div class="card">
-      <div class="card-title">Saisie des Données</div>
+      <div class="card-title">Mesures du Jour</div>
       <div class="grid-2">
         <div>
           <label style="font-size:12px;">Poids (kg) :</label>
@@ -207,9 +260,9 @@
           <input type="number" id="userHeight" placeholder="178">
         </div>
       </div>
-      <label style="font-size:12px;">Bilan / Performances :</label>
-      <textarea id="dailyLog" rows="3" placeholder="Séries validées, sensations..."></textarea>
-      <button class="action-btn" onclick="saveTrackerData()">Sauvegarder</button>
+      <label style="font-size:12px;">Notes / Performances :</label>
+      <textarea id="dailyLog" rows="3" placeholder="Séries, répétitions, ressenti..."></textarea>
+      <button class="action-btn" onclick="saveTrackerData()">Enregistrer</button>
     </div>
 
     <div class="card">
@@ -220,7 +273,7 @@
 
 </div>
 
-<!-- BULLES / BARRE DE NAVIGATION EN BAS -->
+<!-- BARRE DE NAVIGATION FIXE EN BAS -->
 <div class="bottom-nav">
   <button class="nav-item active" onclick="switchTab('briefing', this)">
     <span>⚡</span>
@@ -241,24 +294,29 @@
 </div>
 
 <script>
-  let now = new Date();
+  let currentDateObj = new Date();
 
-  function parseMarkdown(text) {
+  function cleanMarkdown(text) {
     if(!text) return "";
-    let html = text
-      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-      .replace(/^## (.*$)/gim, '<h3>$1</h3>')
-      .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-      .replace(/^\* (.*$)/gim, '<li>$1</li>')
-      .replace(/^- (.*$)/gim, '<li>$1</li>')
-      .replace(/\n\n/gim, '<br>');
     
-    return html.includes('<li>') ? html.replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>') : html;
+    let html = text
+      // Nettoyage complet des balises Markdown brutes
+      .replace(/####\s?(.*)/g, '<h4>$1</h4>')
+      .replace(/###\s?(.*)/g, '<h3>$1</h3>')
+      .replace(/##\s?(.*)/g, '<h3>$1</h3>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/^\*\s?(.*)/gm, '<li>$1</li>')
+      .replace(/^-\s?(.*)/gm, '<li>$1</li>');
+
+    // Mise en forme des listes
+    html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+    
+    return html;
   }
 
-  function getEffectiveDateKey() {
-    const d = new Date();
-    // Si il est moins de 01h00 du matin, on considère qu'on est sur le cycle du jour précédent
+  function getDateKey(date) {
+    const d = new Date(date);
     if (d.getHours() < 1) {
       d.setDate(d.getDate() - 1);
     }
@@ -268,7 +326,7 @@
   function initApp() {
     checkApiKeyDisplay();
     updateDateDisplay();
-    autoCheckAndGenerate();
+    loadDayData();
     renderTracker();
   }
 
@@ -282,13 +340,19 @@
     if(key) {
       localStorage.setItem('gemini_api_key', key);
       checkApiKeyDisplay();
-      autoCheckAndGenerate(true);
+      loadDayData();
     }
   }
 
   function updateDateDisplay() {
     const options = { weekday: 'long', day: 'numeric', month: 'long' };
-    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('fr-FR', options);
+    document.getElementById('currentDate').innerText = currentDateObj.toLocaleDateString('fr-FR', options);
+  }
+
+  function changeDay(offset) {
+    currentDateObj.setDate(currentDateObj.getDate() + offset);
+    updateDateDisplay();
+    loadDayData();
   }
 
   function switchTab(tabId, btn) {
@@ -298,75 +362,93 @@
     btn.classList.add('active');
   }
 
-  async function autoCheckAndGenerate(force = false) {
-    const key = getEffectiveDateKey();
-    const storageData = JSON.parse(localStorage.getItem('day_' + key) || '{}');
-
-    if (!force && storageData.briefing && storageData.workout && storageData.nutrition) {
-      // Affichage des données en cache
-      document.getElementById('briefingContent').innerHTML = parseMarkdown(storageData.briefing);
-      document.getElementById('workoutContent').innerHTML = parseMarkdown(storageData.workout);
-      document.getElementById('nutritionContent').innerHTML = parseMarkdown(storageData.nutrition);
-      document.getElementById('workoutTypeBadge').innerText = getDayType();
-      return;
-    }
-
-    const apiKey = localStorage.getItem('gemini_api_key');
-    if(!apiKey) return;
-
-    document.getElementById('briefingContent').innerText = "Génération du briefing quotidien...";
-    document.getElementById('workoutContent').innerText = "Génération de la séance...";
-    document.getElementById('nutritionContent').innerText = "Génération du plan repas...";
-
-    const dayType = getDayType();
-    document.getElementById('workoutTypeBadge').innerText = dayType;
-
-    // 1. Briefing
-    const briefPrompt = `Rédige un briefing rapide pour aujourd'hui (${dayType}). Sois motivant, direct. Donne les 2 priorités du jour en nutrition et entraînement.`;
-    const briefRes = await callGemini(briefPrompt);
-
-    // 2. Programme
-    const workoutPrompt = `Génère le programme pour un jour de "${dayType}".
-    - Si Musculation (Lundi/Mercredi/Vendredi): 4 exercices ciblés avec séries, répétitions et conseil technique.
-    - Si Course à pied (Dimanche): Plan de séance de course (échauffement, durée, intensité, récupération).
-    - Si Repos: Routine de mobilité et récupération.`;
-    const workoutRes = await callGemini(workoutPrompt);
-
-    // 3. Nutrition
-    const nutritionPrompt = `Propose un plan de repas structuré :
-    1. Petit-déjeuner : Quark, miel, flocons d'avoine.
-    2. Mittagessen & Abendessen : Option 1 (repas idéal structuré), Option 2 (si autre repas consommé : suppléments / ajustements nécessaires).
-    3. À éviter absolument aujourd'hui : 3 éléments néfastes.`;
-    const nutritionRes = await callGemini(nutritionPrompt);
-
-    if (briefRes && workoutRes && nutritionRes) {
-      const dataToSave = {
-        briefing: briefRes,
-        workout: workoutRes,
-        nutrition: nutritionRes
-      };
-      localStorage.setItem('day_' + key, JSON.stringify(dataToSave));
-
-      document.getElementById('briefingContent').innerHTML = parseMarkdown(briefRes);
-      document.getElementById('workoutContent').innerHTML = parseMarkdown(workoutRes);
-      document.getElementById('nutritionContent').innerHTML = parseMarkdown(nutritionRes);
-    }
-  }
-
-  function forceRefreshDay() {
-    autoCheckAndGenerate(true);
-  }
-
-  function getDayType() {
-    const day = new Date().getDay(); // 0 = Dimanche, 1 = Lundi...
+  function getDayType(date) {
+    const day = date.getDay();
     if (day === 1 || day === 3 || day === 5) return "Musculation";
     if (day === 0) return "Course à pied";
     return "Récupération";
   }
 
+  async function loadDayData() {
+    const key = getDateKey(currentDateObj);
+    const dayData = JSON.parse(localStorage.getItem('day_' + key) || '{}');
+    const dayType = getDayType(currentDateObj);
+    
+    document.getElementById('workoutTypeBadge').innerText = dayType;
+
+    if (dayData.briefing) {
+      document.getElementById('briefingContent').innerHTML = cleanMarkdown(dayData.briefing);
+    } else {
+      refreshSection('briefing', false);
+    }
+
+    if (dayData.workout) {
+      document.getElementById('workoutContent').innerHTML = cleanMarkdown(dayData.workout);
+    } else {
+      refreshSection('workout', false);
+    }
+
+    if (dayData.nutrition) {
+      document.getElementById('nutritionContent').innerHTML = cleanMarkdown(dayData.nutrition);
+    } else {
+      refreshSection('nutrition', false);
+    }
+  }
+
+  async function refreshSection(section, explicitCall = true) {
+    const apiKey = localStorage.getItem('gemini_api_key');
+    if (!apiKey) return;
+
+    const key = getDateKey(currentDateObj);
+    const dayType = getDayType(currentDateObj);
+    const storageData = JSON.parse(localStorage.getItem('day_' + key) || '{}');
+
+    if (section === 'briefing') {
+      document.getElementById('briefingContent').innerText = "Génération du briefing...";
+      const prompt = `Rédige un briefing rapide, motivant et direct pour un jour de ${dayType}. Donne 2 priorités absolues du jour. N'utilise aucun titre avec ###.`;
+      const res = await callGemini(prompt);
+      if (res) {
+        storageData.briefing = res;
+        document.getElementById('briefingContent').innerHTML = cleanMarkdown(res);
+      }
+    }
+
+    if (section === 'workout') {
+      document.getElementById('workoutContent').innerText = "Génération du programme...";
+      const prompt = `Génère la séance du jour pour : ${dayType}.
+      - Si Musculation : 4 exercices avec séries, répétitions et conseil technique court.
+      - Si Course à pied : Structure de la séance (Échauffement, Course, Récupération).
+      - Si Récupération : 3 exercices de mobilité.
+      Format sans symboles ###.`;
+      const res = await callGemini(prompt);
+      if (res) {
+        storageData.workout = res;
+        document.getElementById('workoutContent').innerHTML = cleanMarkdown(res);
+      }
+    }
+
+    if (section === 'nutrition') {
+      document.getElementById('nutritionContent').innerText = "Génération du plan repas...";
+      const prompt = `Propose les repas du jour :
+      1. Petit-déjeuner : Quark, miel, flocons d'avoine.
+      2. Repas principaux (Mittagessen & Abendessen) :
+         - Option 1 : Repas idéal structuré
+         - Option 2 : Ajustements / suppléments si repas différent
+      3. À éviter aujourd'hui : 3 éléments néfastes.
+      Format propre sans symboles ### ou ####.`;
+      const res = await callGemini(prompt);
+      if (res) {
+        storageData.nutrition = res;
+        document.getElementById('nutritionContent').innerHTML = cleanMarkdown(res);
+      }
+    }
+
+    localStorage.setItem('day_' + key, JSON.stringify(storageData));
+  }
+
   async function callGemini(prompt) {
     const apiKey = localStorage.getItem('gemini_api_key');
-    const sys = "Tu es Vol d'Esprit, coach direct et efficace. Voix active, tutoiement, phrases courtes, puces Markdown (*). Pas de bavardage inutiles.";
+    const sys = "Tu es Vol d'Esprit, coach direct. Rédige en français avec tutoiement, phrases courtes. Ne mets AUCUN titre Markdown comme ### ou ####. Utilise des tirets simples (-) pour les listes.";
 
     try {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
@@ -377,12 +459,12 @@
       const data = await res.json();
       return data.candidates[0].content.parts[0].text;
     } catch(e) {
-      return "Erreur lors de la génération. Vérifie ta clé API ou la connexion.";
+      return "Erreur lors de la génération. Vérifie ta connexion.";
     }
   }
 
   function saveTrackerData() {
-    const key = getEffectiveDateKey();
+    const key = getDateKey(currentDateObj);
     const weight = document.getElementById('userWeight').value;
     const height = document.getElementById('userHeight').value;
     const log = document.getElementById('dailyLog').value;
@@ -390,7 +472,7 @@
     const trackerObj = { weight, height, log, date: key };
     localStorage.setItem('track_' + key, JSON.stringify(trackerObj));
     renderTracker();
-    alert('Données sauvegardées.');
+    alert('Mesures enregistrées pour le ' + key);
   }
 
   function renderTracker() {
@@ -415,3 +497,4 @@
 
 </body>
 </html>
+0
