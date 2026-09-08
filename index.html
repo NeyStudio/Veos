@@ -98,14 +98,6 @@
       font-size: 12px;
       font-weight: 600;
     }
-    .workout-step {
-      background: var(--card-accent);
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-    .workout-step h4 { margin: 0 0 6px 0; color: var(--accent); }
-    .workout-step p { margin: 0; font-size: 13px; color: var(--text-sub); }
     .meal-box {
       border-left: 3px solid var(--accent);
       padding-left: 12px;
@@ -117,7 +109,6 @@
       border-bottom: 1px solid var(--border);
     }
     .history-item:last-child { border-bottom: none; }
-    #aiContent { white-space: pre-wrap; line-height: 1.5; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -135,11 +126,14 @@
     </div>
   </div>
 
-  <!-- Clé API -->
-  <div class="card">
-    <div class="card-title">1. Clé API Gemini</div>
-    <input type="password" id="apiKey" placeholder="Colle ta clé API Gemini">
-    <button onclick="saveApiKey()">Sauvegarder</button>
+  <!-- Saisie Clé API (Masquée dès que configurée) -->
+  <div class="card" id="apiKeyCard">
+    <div class="card-title">1. Configuration de la Clé API Gemini</div>
+    <p style="font-size: 13px; color: var(--text-sub); margin-top:0;">
+      Colle ta clé API Google AI Studio (commençant par AIzaSy...). Cette étape n'est nécessaire qu'une seule fois.
+    </p>
+    <input type="password" id="apiKey" placeholder="Colle ta clé API ici (AIzaSy...)">
+    <button onclick="saveApiKey()">Enregistrer la clé</button>
   </div>
 
   <!-- NOW BRIEFING JOURNALIER -->
@@ -151,7 +145,7 @@
   <!-- SEANCE DU JOUR GENEREE PAR GEMINI -->
   <div class="card">
     <div class="card-title">Programme du Jour</div>
-    <button onclick="generateDailyWorkout()">Générer / Actualiser la séance du jour via Gemini</button>
+    <button onclick="generateDailyWorkout()">Générer / Actualiser la séance du jour</button>
     <div id="workoutContainer">Clique sur le bouton pour construire la séance du jour.</div>
   </div>
 
@@ -200,10 +194,31 @@
   }
 
   function initApp() {
-    document.getElementById('apiKey').value = localStorage.getItem('gemini_api_key') || '';
+    checkApiKeyDisplay();
     updateDateDisplay();
     loadDayData();
     renderHistory();
+  }
+
+  function checkApiKeyDisplay() {
+    const key = localStorage.getItem('gemini_api_key');
+    const card = document.getElementById('apiKeyCard');
+    if (key && key.trim().length > 0) {
+      card.style.display = 'none';
+    } else {
+      card.style.display = 'block';
+    }
+  }
+
+  function saveApiKey() {
+    const inputKey = document.getElementById('apiKey').value.trim();
+    if (!inputKey.startsWith("AIzaSy")) {
+      alert("Attention: La clé saisie semble invalide. Une clé Gemini valide commence par 'AIzaSy'.");
+      return;
+    }
+    localStorage.setItem('gemini_api_key', inputKey);
+    checkApiKeyDisplay();
+    alert('Clé API enregistrée avec succès.');
   }
 
   function updateDateDisplay() {
@@ -215,12 +230,6 @@
     currentDateObj.setDate(currentDateObj.getDate() + offset);
     updateDateDisplay();
     loadDayData();
-  }
-
-  function saveApiKey() {
-    const key = document.getElementById('apiKey').value.trim();
-    localStorage.setItem('gemini_api_key', key);
-    alert('Clé API sauvegardée.');
   }
 
   function getStorageKey() {
@@ -290,7 +299,8 @@
   async function callGemini(prompt) {
     const apiKey = localStorage.getItem('gemini_api_key');
     if (!apiKey) {
-      alert('Entre d\'abord ta clé API Gemini.');
+      alert("Aucune clé API enregistrée. Veuillez configurer votre clé dans le bloc supérieur.");
+      document.getElementById('apiKeyCard').style.display = 'block';
       return null;
     }
 
@@ -304,10 +314,17 @@
           contents: [{ parts: [{ text: systemInstructions + "\n\n" + prompt }] }]
         })
       });
+
       const resData = await response.json();
+
+      if (resData.error) {
+        alert("Erreur API Gemini : " + resData.error.message);
+        return null;
+      }
+
       return resData.candidates[0].content.parts[0].text;
     } catch (e) {
-      alert('Erreur lors de la connexion à l\'API Gemini.');
+      alert("Erreur lors de la connexion à l'API Gemini. Vérifie ta connexion réseau ou la validité de la clé.");
       return null;
     }
   }
