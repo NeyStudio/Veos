@@ -87,7 +87,6 @@
       border: 1px solid var(--accent);
     }
     
-    /* Formatage couleur et typographie */
     .clean-content h3, .clean-content h4 {
       color: var(--accent);
       margin: 14px 0 6px 0;
@@ -116,7 +115,6 @@
       color: var(--text);
     }
 
-    /* Navigation Bas de Page */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -199,7 +197,6 @@
     </div>
   </div>
 
-  <!-- Saisie Clé API -->
   <div class="card" id="apiKeyCard">
     <div class="card-title">Configuration Clé API</div>
     <input type="password" id="apiKey" placeholder="Colle ta clé API Gemini (AIzaSy...)">
@@ -301,6 +298,10 @@
 <script>
   let currentDateObj = new Date();
 
+  function getApiKey() {
+    return localStorage.getItem('gemini_api_key') || "";
+  }
+
   function cleanMarkdown(text) {
     if(!text) return "";
     
@@ -335,7 +336,7 @@
   }
 
   function checkApiKeyDisplay() {
-    const key = localStorage.getItem('gemini_api_key');
+    const key = getApiKey();
     document.getElementById('apiKeyCard').style.display = (key && key.trim()) ? 'none' : 'block';
   }
 
@@ -400,7 +401,7 @@
   }
 
   async function refreshSection(section, explicitCall = true) {
-    const apiKey = localStorage.getItem('gemini_api_key');
+    const apiKey = getApiKey();
     if (!apiKey) return;
 
     const key = getDateKey(currentDateObj);
@@ -451,11 +452,11 @@
   }
 
   async function callGemini(prompt) {
-    const apiKey = localStorage.getItem('gemini_api_key');
+    const apiKey = getApiKey();
     const sys = "Tu es Vol d'Esprit, coach direct. Rédige en français avec tutoiement, phrases courtes. Ne mets AUCUN titre Markdown comme ###. Utilise des tirets simples (-) pour les listes.";
 
     try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: sys + "\n\n" + prompt }] }] })
@@ -463,8 +464,7 @@
       const data = await res.json();
       
       if (data.error) {
-        console.error("Erreur API:", data.error);
-        return "Erreur d'autorisation ou de clé API : " + data.error.message;
+        return "Erreur API : " + data.error.message;
       }
       
       return data.candidates[0].content.parts[0].text;
