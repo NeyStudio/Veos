@@ -455,12 +455,18 @@
     const sys = "Tu es Vol d'Esprit, coach direct. Rédige en français avec tutoiement, phrases courtes. Ne mets AUCUN titre Markdown comme ###. Utilise des tirets simples (-) pour les listes.";
 
     try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: sys + "\n\n" + prompt }] }] })
       });
       const data = await res.json();
+      
+      if (data.error) {
+        console.error("Erreur API:", data.error);
+        return "Erreur d'autorisation ou de clé API : " + data.error.message;
+      }
+      
       return data.candidates[0].content.parts[0].text;
     } catch(e) {
       return "Erreur de connexion.";
