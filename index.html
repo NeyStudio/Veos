@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vol d'Esprit - OS V2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Vol d'Esprit OS</title>
   <style>
     :root {
       --bg: #090d16;
@@ -13,6 +13,7 @@
       --text: #f8fafc;
       --text-sub: #94a3b8;
       --border: #1e293b;
+      --danger: #ef4444;
       --success: #22c55e;
     }
     body {
@@ -21,10 +22,10 @@
       color: var(--text);
       margin: 0;
       padding: 0;
-      padding-bottom: 40px;
+      padding-bottom: 90px;
     }
     .container {
-      max-width: 900px;
+      max-width: 600px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -32,43 +33,90 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 0;
+      padding: 12px 0;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .header h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 20px;
       color: var(--accent);
       letter-spacing: -0.5px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
     }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
     }
     .card-title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       margin-top: 0;
       margin-bottom: 12px;
       color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .now-brief {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       border: 1px solid var(--accent);
     }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+    
+    /* Formatage esthétique du contenu généré */
+    .formatted-content h3 { color: var(--accent); font-size: 15px; margin: 12px 0 6px 0; }
+    .formatted-content ul { padding-left: 18px; margin: 6px 0; }
+    .formatted-content li { margin-bottom: 4px; font-size: 14px; line-height: 1.4; color: #e2e8f0; }
+    .formatted-content p { font-size: 14px; line-height: 1.4; margin: 6px 0; }
+    .formatted-content strong { color: #ffffff; }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #0f172a;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 1000;
     }
-    @media (max-width: 600px) {
-      .grid-2 { grid-template-columns: 1fr; }
+    .nav-item {
+      background: transparent;
+      border: none;
+      color: var(--text-sub);
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      padding: 4px;
+      margin: 0;
+      width: auto;
     }
-    input, select, textarea, button {
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    input, textarea, button.action-btn {
       width: 100%;
       padding: 12px;
       margin-top: 6px;
@@ -80,35 +128,14 @@
       box-sizing: border-box;
       font-size: 14px;
     }
-    button {
+    button.action-btn {
       background: var(--accent);
       color: #090d16;
       font-weight: 700;
       cursor: pointer;
       border: none;
-      transition: background 0.2s, opacity 0.2s;
     }
-    button:hover { opacity: 0.9; }
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: rgba(56, 189, 248, 0.1);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .meal-box {
-      border-left: 3px solid var(--accent);
-      padding-left: 12px;
-      margin-bottom: 12px;
-    }
-    .history-item {
-      font-size: 13px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .history-item:last-child { border-bottom: none; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   </style>
 </head>
 <body>
@@ -120,254 +147,267 @@
       <h1>VOL D'ESPRIT OS</h1>
       <span class="badge" id="currentDate">--/--/----</span>
     </div>
-    <div>
-      <button onclick="changeDay(-1)" style="width: auto; padding: 6px 12px; margin:0;">&lt;</button>
-      <button onclick="changeDay(1)" style="width: auto; padding: 6px 12px; margin:0;">&gt;</button>
-    </div>
+    <button onclick="forceRefreshDay()" style="width:auto; padding:6px 12px; font-size:12px; background:var(--card-accent); color:var(--accent); border:1px solid var(--border); border-radius:8px;">Actualiser</button>
   </div>
 
-  <!-- Saisie Clé API -->
+  <!-- Saisie Clé API (Masquée dès que configurée) -->
   <div class="card" id="apiKeyCard">
-    <div class="card-title">1. Configuration de la Clé API Gemini</div>
-    <p style="font-size: 13px; color: var(--text-sub); margin-top:0;">
-      Colle ta clé API Google AI Studio (commençant par AIzaSy...).
-    </p>
-    <input type="password" id="apiKey" placeholder="Colle ta clé API ici (AIzaSy...)">
-    <button onclick="saveApiKey()">Enregistrer la clé</button>
+    <div class="card-title">Configuration Clé API</div>
+    <input type="password" id="apiKey" placeholder="Colle ta clé API Gemini (AIzaSy...)">
+    <button class="action-btn" onclick="saveApiKey()">Enregistrer</button>
   </div>
 
-  <!-- NOW BRIEFING JOURNALIER -->
-  <div class="card now-brief">
-    <div class="card-title">Now Briefing</div>
-    <div id="briefingText">Chargement de ton briefing quotidien...</div>
-  </div>
-
-  <!-- SEANCE DU JOUR GENEREE PAR GEMINI -->
-  <div class="card">
-    <div class="card-title">Programme du Jour</div>
-    <button onclick="generateDailyWorkout()">Générer / Actualiser la séance du jour</button>
-    <div id="workoutContainer">Clique sur le bouton pour construire la séance du jour.</div>
-  </div>
-
-  <!-- NUTRITION : 3 SUGGESTIONS -->
-  <div class="card">
-    <div class="card-title">Nutrition Recommandée</div>
-    <button onclick="generateNutrition()">Générer les suggestions de repas du jour</button>
-    <div id="nutritionContainer">
-      <div class="meal-box">
-        <strong>Petit-Déjeuner Référence :</strong> Quark, miel, flocons d'avoine.
-      </div>
+  <!-- SECTION 1 : BRIEFING (ACCUEIL) -->
+  <div id="tab-briefing" class="tab-content active">
+    <div class="card now-brief">
+      <div class="card-title">Now Briefing</div>
+      <div id="briefingContent" class="formatted-content">Mise à jour automatique en cours...</div>
+    </div>
+    
+    <div class="card">
+      <div class="card-title">Rappel Routine</div>
+      <ul style="padding-left:18px; margin:0; font-size:14px; color:var(--text-sub);">
+        <li><strong>Lundi / Mercredi / Vendredi</strong> : Musculation</li>
+        <li><strong>Dimanche</strong> : Course à pied</li>
+        <li><strong>Matin</strong> : Quark, miel, flocons d'avoine</li>
+      </ul>
     </div>
   </div>
 
-  <!-- SUIVI DES PROGRES ET HISTORIQUE -->
-  <div class="card">
-    <div class="card-title">Mesures & Performances du Jour</div>
-    <div class="grid-2">
-      <div>
-        <label>Poids actuel (kg) :</label>
-        <input type="number" id="userWeight" step="0.1" placeholder="ex: 72.5">
+  <!-- SECTION 2 : PROGRAMME -->
+  <div id="tab-workout" class="tab-content">
+    <div class="card">
+      <div class="card-title">
+        <span>Programme du Jour</span>
+        <span id="workoutTypeBadge" class="badge">--</span>
       </div>
-      <div>
-        <label>Taille (cm) :</label>
-        <input type="number" id="userHeight" placeholder="ex: 178">
-      </div>
+      <div id="workoutContent" class="formatted-content">Chargement de la séance...</div>
     </div>
-    <label>Notes de performances (Séries, Répétitions, Ressenti) :</label>
-    <textarea id="dailyLog" rows="3" placeholder="ex: Développé couché 4x10 à 60kg. Bonne congestion."></textarea>
-    <button onclick="saveDayData()">Enregistrer la journée</button>
   </div>
 
-  <!-- HISTORIQUE COMPLET -->
-  <div class="card">
-    <div class="card-title">Historique des Données</div>
-    <div id="historyLogs">Chargement de l'historique...</div>
+  <!-- SECTION 3 : NUTRITION -->
+  <div id="tab-nutrition" class="tab-content">
+    <div class="card">
+      <div class="card-title">Plan Nutritionnel</div>
+      <div id="nutritionContent" class="formatted-content">Chargement du plan repas...</div>
+    </div>
+  </div>
+
+  <!-- SECTION 4 : SUIVI & MESURES -->
+  <div id="tab-tracker" class="tab-content">
+    <div class="card">
+      <div class="card-title">Saisie des Données</div>
+      <div class="grid-2">
+        <div>
+          <label style="font-size:12px;">Poids (kg) :</label>
+          <input type="number" id="userWeight" step="0.1" placeholder="72.5">
+        </div>
+        <div>
+          <label style="font-size:12px;">Taille (cm) :</label>
+          <input type="number" id="userHeight" placeholder="178">
+        </div>
+      </div>
+      <label style="font-size:12px;">Bilan / Performances :</label>
+      <textarea id="dailyLog" rows="3" placeholder="Séries validées, sensations..."></textarea>
+      <button class="action-btn" onclick="saveTrackerData()">Sauvegarder</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Historique</div>
+      <div id="historyLogs" style="font-size:13px; color:var(--text-sub);">Chargement...</div>
+    </div>
   </div>
 
 </div>
 
-<script>
-  let currentDateObj = new Date();
+<!-- BULLES / BARRE DE NAVIGATION EN BAS -->
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="switchTab('briefing', this)">
+    <span>⚡</span>
+    <span>Briefing</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('workout', this)">
+    <span>🏋️</span>
+    <span>Séance</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('nutrition', this)">
+    <span>🥗</span>
+    <span>Repas</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('tracker', this)">
+    <span>📊</span>
+    <span>Suivi</span>
+  </button>
+</div>
 
-  function formatDateKey(date) {
-    return date.toISOString().split('T')[0];
+<script>
+  let now = new Date();
+
+  function parseMarkdown(text) {
+    if(!text) return "";
+    let html = text
+      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gim, '<h3>$1</h3>')
+      .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+      .replace(/^\* (.*$)/gim, '<li>$1</li>')
+      .replace(/^- (.*$)/gim, '<li>$1</li>')
+      .replace(/\n\n/gim, '<br>');
+    
+    return html.includes('<li>') ? html.replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>') : html;
+  }
+
+  function getEffectiveDateKey() {
+    const d = new Date();
+    // Si il est moins de 01h00 du matin, on considère qu'on est sur le cycle du jour précédent
+    if (d.getHours() < 1) {
+      d.setDate(d.getDate() - 1);
+    }
+    return d.toISOString().split('T')[0];
   }
 
   function initApp() {
     checkApiKeyDisplay();
     updateDateDisplay();
-    loadDayData();
-    renderHistory();
+    autoCheckAndGenerate();
+    renderTracker();
   }
 
   function checkApiKeyDisplay() {
     const key = localStorage.getItem('gemini_api_key');
-    const card = document.getElementById('apiKeyCard');
-    if (key && key.trim().length > 0) {
-      card.style.display = 'none';
-    } else {
-      card.style.display = 'block';
-    }
+    document.getElementById('apiKeyCard').style.display = (key && key.trim()) ? 'none' : 'block';
   }
 
   function saveApiKey() {
-    const inputKey = document.getElementById('apiKey').value.trim();
-    if (!inputKey.startsWith("AIzaSy")) {
-      alert("Attention: La clé saisie semble invalide. Une clé Gemini valide commence par 'AIzaSy'.");
-      return;
+    const key = document.getElementById('apiKey').value.trim();
+    if(key) {
+      localStorage.setItem('gemini_api_key', key);
+      checkApiKeyDisplay();
+      autoCheckAndGenerate(true);
     }
-    localStorage.setItem('gemini_api_key', inputKey);
-    checkApiKeyDisplay();
-    alert('Clé API enregistrée avec succès.');
   }
 
   function updateDateDisplay() {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('currentDate').innerText = currentDateObj.toLocaleDateString('fr-FR', options);
+    const options = { weekday: 'long', day: 'numeric', month: 'long' };
+    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('fr-FR', options);
   }
 
-  function changeDay(offset) {
-    currentDateObj.setDate(currentDateObj.getDate() + offset);
-    updateDateDisplay();
-    loadDayData();
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    btn.classList.add('active');
   }
 
-  function getStorageKey() {
-    return 'data_' + formatDateKey(currentDateObj);
-  }
+  async function autoCheckAndGenerate(force = false) {
+    const key = getEffectiveDateKey();
+    const storageData = JSON.parse(localStorage.getItem('day_' + key) || '{}');
 
-  function loadDayData() {
-    const data = JSON.parse(localStorage.getItem(getStorageKey()) || '{}');
-    document.getElementById('userWeight').value = data.weight || '';
-    document.getElementById('userHeight').value = data.height || '';
-    document.getElementById('dailyLog').value = data.log || '';
-    
-    document.getElementById('workoutContainer').innerHTML = data.workout || "Clique sur le bouton pour construire la séance du jour.";
-    document.getElementById('nutritionContainer').innerHTML = data.nutrition || `<div class="meal-box"><strong>Petit-Déjeuner Référence :</strong> Quark, miel, flocons d'avoine.</div>`;
-    
-    updateBriefing(data);
-  }
-
-  function saveDayData() {
-    const key = getStorageKey();
-    const existing = JSON.parse(localStorage.getItem(key) || '{}');
-    
-    const updated = {
-      ...existing,
-      weight: document.getElementById('userWeight').value,
-      height: document.getElementById('userHeight').value,
-      log: document.getElementById('dailyLog').value
-    };
-    
-    localStorage.setItem(key, JSON.stringify(updated));
-    renderHistory();
-    updateBriefing(updated);
-    alert('Données du jour enregistrées.');
-  }
-
-  function updateBriefing(data) {
-    const briefing = document.getElementById('briefingText');
-    const weightText = data.weight ? `${data.weight} kg` : 'Non renseigné';
-    const logText = data.log ? 'Séance/Notes enregistrées' : 'Aucune note pour ce jour';
-
-    briefing.innerHTML = `
-      <p style="margin:0 0 8px 0; font-size: 15px;"><strong>Statut du jour :</strong> ${logText}</p>
-      <p style="margin:0; font-size: 13px; color: var(--text-sub);">Poids enregistré : <strong>${weightText}</strong></p>
-    `;
-  }
-
-  function renderHistory() {
-    const container = document.getElementById('historyLogs');
-    const keys = Object.keys(localStorage).filter(k => k.startsWith('data_')).sort().reverse();
-    
-    if (keys.length === 0) {
-      container.innerHTML = "Aucun historique disponible.";
+    if (!force && storageData.briefing && storageData.workout && storageData.nutrition) {
+      // Affichage des données en cache
+      document.getElementById('briefingContent').innerHTML = parseMarkdown(storageData.briefing);
+      document.getElementById('workoutContent').innerHTML = parseMarkdown(storageData.workout);
+      document.getElementById('nutritionContent').innerHTML = parseMarkdown(storageData.nutrition);
+      document.getElementById('workoutTypeBadge').innerText = getDayType();
       return;
     }
 
-    container.innerHTML = keys.map(k => {
-      const dateStr = k.replace('data_', '');
-      const d = JSON.parse(localStorage.getItem(k));
-      return `
-        <div class="history-item">
-          <strong>${dateStr}</strong> | Poids: ${d.weight || '--'} kg | Notes: ${d.log || 'Aucune'}
-        </div>
-      `;
-    }).join('');
+    const apiKey = localStorage.getItem('gemini_api_key');
+    if(!apiKey) return;
+
+    document.getElementById('briefingContent').innerText = "Génération du briefing quotidien...";
+    document.getElementById('workoutContent').innerText = "Génération de la séance...";
+    document.getElementById('nutritionContent').innerText = "Génération du plan repas...";
+
+    const dayType = getDayType();
+    document.getElementById('workoutTypeBadge').innerText = dayType;
+
+    // 1. Briefing
+    const briefPrompt = `Rédige un briefing rapide pour aujourd'hui (${dayType}). Sois motivant, direct. Donne les 2 priorités du jour en nutrition et entraînement.`;
+    const briefRes = await callGemini(briefPrompt);
+
+    // 2. Programme
+    const workoutPrompt = `Génère le programme pour un jour de "${dayType}".
+    - Si Musculation (Lundi/Mercredi/Vendredi): 4 exercices ciblés avec séries, répétitions et conseil technique.
+    - Si Course à pied (Dimanche): Plan de séance de course (échauffement, durée, intensité, récupération).
+    - Si Repos: Routine de mobilité et récupération.`;
+    const workoutRes = await callGemini(workoutPrompt);
+
+    // 3. Nutrition
+    const nutritionPrompt = `Propose un plan de repas structuré :
+    1. Petit-déjeuner : Quark, miel, flocons d'avoine.
+    2. Mittagessen & Abendessen : Option 1 (repas idéal structuré), Option 2 (si autre repas consommé : suppléments / ajustements nécessaires).
+    3. À éviter absolument aujourd'hui : 3 éléments néfastes.`;
+    const nutritionRes = await callGemini(nutritionPrompt);
+
+    if (briefRes && workoutRes && nutritionRes) {
+      const dataToSave = {
+        briefing: briefRes,
+        workout: workoutRes,
+        nutrition: nutritionRes
+      };
+      localStorage.setItem('day_' + key, JSON.stringify(dataToSave));
+
+      document.getElementById('briefingContent').innerHTML = parseMarkdown(briefRes);
+      document.getElementById('workoutContent').innerHTML = parseMarkdown(workoutRes);
+      document.getElementById('nutritionContent').innerHTML = parseMarkdown(nutritionRes);
+    }
+  }
+
+  function forceRefreshDay() {
+    autoCheckAndGenerate(true);
+  }
+
+  function getDayType() {
+    const day = new Date().getDay(); // 0 = Dimanche, 1 = Lundi...
+    if (day === 1 || day === 3 || day === 5) return "Musculation";
+    if (day === 0) return "Course à pied";
+    return "Récupération";
   }
 
   async function callGemini(prompt) {
     const apiKey = localStorage.getItem('gemini_api_key');
-    if (!apiKey) {
-      alert("Aucune clé API enregistrée. Veuillez configurer votre clé dans le bloc supérieur.");
-      document.getElementById('apiKeyCard').style.display = 'block';
-      return null;
-    }
-
-    const systemInstructions = "Tu es Vol d'Esprit. Sois clair, direct, motivant. Utilise la voix active, le tutoiement, des phrases courtes et des listes à puces. Pas de clichés, pas de formules d'introduction ou de conclusion inutiles.";
+    const sys = "Tu es Vol d'Esprit, coach direct et efficace. Voix active, tutoiement, phrases courtes, puces Markdown (*). Pas de bavardage inutiles.";
 
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: systemInstructions + "\n\n" + prompt }] }]
-        })
+        body: JSON.stringify({ contents: [{ parts: [{ text: sys + "\n\n" + prompt }] }] })
       });
-
-      const resData = await response.json();
-
-      if (resData.error) {
-        alert("Erreur API Gemini : " + resData.error.message);
-        return null;
-      }
-
-      return resData.candidates[0].content.parts[0].text;
-    } catch (e) {
-      alert("Erreur lors de la connexion à l'API Gemini. Vérifie ta connexion réseau ou la validité de la clé.");
-      return null;
+      const data = await res.json();
+      return data.candidates[0].content.parts[0].text;
+    } catch(e) {
+      return "Erreur lors de la génération. Vérifie ta clé API ou la connexion.";
     }
   }
 
-  async function generateDailyWorkout() {
-    const container = document.getElementById('workoutContainer');
-    container.innerText = "Génération de la séance par Vol d'Esprit...";
-    
-    const prompt = `Génère une liste précise de 4 exercices pour la séance du jour. Pour chaque exercice, indique le nom, le nombre de séries, les répétitions et un conseil technique d'exécution. Format clair avec puces.`;
-    const result = await callGemini(prompt);
-    
-    if (result) {
-      const formatted = `<div style="white-space: pre-wrap; line-height: 1.5;">${result}</div>`;
-      container.innerHTML = formatted;
-      
-      const key = getStorageKey();
-      const existing = JSON.parse(localStorage.getItem(key) || '{}');
-      existing.workout = formatted;
-      localStorage.setItem(key, JSON.stringify(existing));
-    }
+  function saveTrackerData() {
+    const key = getEffectiveDateKey();
+    const weight = document.getElementById('userWeight').value;
+    const height = document.getElementById('userHeight').value;
+    const log = document.getElementById('dailyLog').value;
+
+    const trackerObj = { weight, height, log, date: key };
+    localStorage.setItem('track_' + key, JSON.stringify(trackerObj));
+    renderTracker();
+    alert('Données sauvegardées.');
   }
 
-  async function generateNutrition() {
-    const container = document.getElementById('nutritionContainer');
-    container.innerText = "Génération des options de repas...";
-    
-    const prompt = `Propose exactement 3 suggestions de repas précises :
-1. Petit-déjeuner (incluant Quark, miel, flocons d'avoine)
-2. Repas Avant séance (énergie et digestion rapide)
-3. Repas Après séance (reconstruction musculaire)
-Sois concis et direct.`;
+  function renderTracker() {
+    const container = document.getElementById('historyLogs');
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('track_')).sort().reverse();
 
-    const result = await callGemini(prompt);
-    
-    if (result) {
-      const formatted = `<div style="white-space: pre-wrap; line-height: 1.5;">${result}</div>`;
-      container.innerHTML = formatted;
-      
-      const key = getStorageKey();
-      const existing = JSON.parse(localStorage.getItem(key) || '{}');
-      existing.nutrition = formatted;
-      localStorage.setItem(key, JSON.stringify(existing));
+    if (keys.length === 0) {
+      container.innerHTML = "Aucune saisie enregistrée.";
+      return;
     }
+
+    container.innerHTML = keys.map(k => {
+      const d = JSON.parse(localStorage.getItem(k));
+      return `<div style="padding:6px 0; border-bottom:1px solid var(--border);">
+        <strong>${d.date}</strong> — ${d.weight ? d.weight + 'kg' : ''} | ${d.log || ''}
+      </div>`;
+    }).join('');
   }
 
   initApp();
