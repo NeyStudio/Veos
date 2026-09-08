@@ -98,6 +98,14 @@
       font-size: 12px;
       font-weight: 600;
     }
+    .workout-step {
+      background: var(--card-accent);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .workout-step h4 { margin: 0 0 6px 0; color: var(--accent); }
+    .workout-step p { margin: 0; font-size: 13px; color: var(--text-sub); }
     .meal-box {
       border-left: 3px solid var(--accent);
       padding-left: 12px;
@@ -109,6 +117,7 @@
       border-bottom: 1px solid var(--border);
     }
     .history-item:last-child { border-bottom: none; }
+    #aiContent { white-space: pre-wrap; line-height: 1.5; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -126,10 +135,11 @@
     </div>
   </div>
 
-  <!-- Clé API (Auto-Configurée) -->
-  <div class="card" style="display: none;">
+  <!-- Clé API -->
+  <div class="card">
     <div class="card-title">1. Clé API Gemini</div>
-    <input type="password" id="apiKey">
+    <input type="password" id="apiKey" placeholder="Colle ta clé API Gemini">
+    <button onclick="saveApiKey()">Sauvegarder</button>
   </div>
 
   <!-- NOW BRIEFING JOURNALIER -->
@@ -141,7 +151,7 @@
   <!-- SEANCE DU JOUR GENEREE PAR GEMINI -->
   <div class="card">
     <div class="card-title">Programme du Jour</div>
-    <button onclick="generateDailyWorkout()">Générer / Actualiser la séance du jour</button>
+    <button onclick="generateDailyWorkout()">Générer / Actualiser la séance du jour via Gemini</button>
     <div id="workoutContainer">Clique sur le bouton pour construire la séance du jour.</div>
   </div>
 
@@ -183,7 +193,6 @@
 </div>
 
 <script>
-  const HARDCODED_API_KEY = "AQ.Ab8RN6K-9DzsDhgV_zaBNkPcc3qPi4sHPlME9QliDKAka3jF2g";
   let currentDateObj = new Date();
 
   function formatDateKey(date) {
@@ -191,8 +200,7 @@
   }
 
   function initApp() {
-    localStorage.setItem('gemini_api_key', HARDCODED_API_KEY);
-    document.getElementById('apiKey').value = HARDCODED_API_KEY;
+    document.getElementById('apiKey').value = localStorage.getItem('gemini_api_key') || '';
     updateDateDisplay();
     loadDayData();
     renderHistory();
@@ -207,6 +215,12 @@
     currentDateObj.setDate(currentDateObj.getDate() + offset);
     updateDateDisplay();
     loadDayData();
+  }
+
+  function saveApiKey() {
+    const key = document.getElementById('apiKey').value.trim();
+    localStorage.setItem('gemini_api_key', key);
+    alert('Clé API sauvegardée.');
   }
 
   function getStorageKey() {
@@ -274,10 +288,16 @@
   }
 
   async function callGemini(prompt) {
+    const apiKey = localStorage.getItem('gemini_api_key');
+    if (!apiKey) {
+      alert('Entre d\'abord ta clé API Gemini.');
+      return null;
+    }
+
     const systemInstructions = "Tu es Vol d'Esprit. Sois clair, direct, motivant. Utilise la voix active, le tutoiement, des phrases courtes et des listes à puces. Pas de clichés, pas de formules d'introduction ou de conclusion inutiles.";
 
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${HARDCODED_API_KEY}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
